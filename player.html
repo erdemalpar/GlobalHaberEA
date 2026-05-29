@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Global Haber Canlı Yayın Oynatıcı</title>
+    <!-- HLS.js kütüphanesi CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .hata-mesaji {
+            color: #ff4a4a;
+            font-family: sans-serif;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <video id="canliOynatici" controls autoplay muted playsinline></video>
+    <div id="hataAlani" class="hata-mesaji" style="display: none;"></div>
+
+    <script>
+        const urlParametreleri = new URLSearchParams(window.location.search);
+        const yayinUrl = urlParametreleri.get('src');
+        const videoElementi = document.getElementById('canliOynatici');
+        const hataElementi = document.getElementById('hataAlani');
+
+        if (yayinUrl) {
+            if (Hls.isSupported()) {
+                const hlsSecenegi = new Hls({
+                    enableWorker: true,
+                    lowLatencyMode: true
+                });
+                hlsSecenegi.loadSource(yayinUrl);
+                hlsSecenegi.attachMedia(videoElementi);
+                hlsSecenegi.on(Hls.Events.MANIFEST_PARSED, function() {
+                    videoElementi.play().catch(function(hata) {
+                        console.log("Otomatik oynatma engellendi, etkileşim bekleniyor:", hata);
+                    });
+                });
+                hlsSecenegi.on(Hls.Events.ERROR, function(olay, veri) {
+                    if (veri.fatal) {
+                        switch (veri.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                console.error("Ağ hatası, akış yeniden yüklenmeye çalışılıyor...");
+                                hlsSecenegi.startLoad();
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                console.error("Medya hatası, kurtarılmaya çalışılıyor...");
+                                hlsSecenegi.recoverMediaError();
+                                break;
+                            default:
+                                console.error("Kurtarılamayan HLS hatası:", veri);
+                                hataElementi.textContent = "Yayın yüklenemedi veya akış sonlandırıldı.";
+                                hataElementi.style.display = "block";
+                                videoElementi.style.display = "none";
+                                hlsSecenegi.destroy();
+                                break;
+                        }
+                    }
+                });
+            } else if (videoElementi.canPlayType('application/vnd.apple.mpegurl')) {
+                // Safari ve yerel HLS destekleyen tarayıcılar için
+                videoElementi.src = yayinUrl;
+                videoElementi.addEventListener('loadedmetadata', function() {
+                    videoElementi.play().catch(function(hata) {
+                        console.log("Otomatik oynatma engellendi:", hata);
+                    });
+                });
+            } else {
+                hataElementi.textContent = "Tarayıcınız bu canlı yayın formatını desteklemiyor.";
+                hataElementi.style.display = "block";
+                videoElementi.style.display = "none";
+            }
+        } else {
+            hataElementi.textContent = "Geçerli bir yayın adresi belirtilmedi.";
+            hataElementi.style.display = "block";
+            videoElementi.style.display = "none";
+        }
+    </script>
+</body>
+</html>

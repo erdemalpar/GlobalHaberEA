@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Haber - Anlık Haber Akışı ve Canlı Yayın Portalı</title>
+    
+    <!-- SEO Metaları -->
+    <meta name="description" content="Dünyanın en ünlü haber kanallarını canlı izleyin ve popüler haber ajanslarının anlık akışlarını tek bir ekrandan takip edin. Türkiye ve dünya gündemi.">
+    <meta name="keywords" content="haber, canlı haber, haber ajansları, canlı tv, reuters, aa, ap, bbc, cnn, trt haber">
+    <meta name="author" content="Global Haber">
+    
+    <!-- FontAwesome İkon Kütüphanesi -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Stil Dosyası -->
+    <link rel="stylesheet" href="index.css">
+    
+    <!-- Leaflet Harita Kütüphanesi -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body>
+
+    <!-- Arka Plan Işıkları (Glow Effects) -->
+    <div class="arka-plan-isik-1"></div>
+    <div class="arka-plan-isik-2"></div>
+
+    <!-- Üst Menü / Header -->
+    <header class="ust-menu">
+        <div class="logo-alani">
+            <i class="fa-solid fa-earth-americas logo-ikonu"></i>
+            <h1 class="logo-baslik">GLOBAL HABER</h1>
+        </div>
+        <div class="ust-butonlar">
+            <button id="dugmeDunyaHaritasi" class="buton-modern vurgulu-buton" title="Dünya Haritasını Aç">
+                <i class="fa-solid fa-earth-americas"></i> Dünya Haritası
+            </button>
+            <button id="dugmeTumunuTemizle" class="buton-modern" title="Tüm filtreleri sıfırla">
+                <i class="fa-solid fa-filter-circle-xmark"></i> Filtreleri Sıfırla
+            </button>
+            <button id="dugmeAyarlar" class="buton-modern" title="Ayarları Düzenle">
+                <i class="fa-solid fa-sliders"></i> Ayarlar
+            </button>
+        </div>
+    </header>
+
+    <!-- Ana İçerik Alanı -->
+    <main class="ana-icerik">
+        
+        <!-- SOL BAR: HABER AJANSLARI VE HARİTASI -->
+        <aside class="yan-bar">
+            <!-- Harita Bölümü -->
+            <div class="bar-bolumu">
+                <div class="bar-bolum-basligi">
+                    <span><i class="fa-solid fa-globe"></i> Ajans Haritası</span>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button type="button" id="ajansHaritaBuyut" class="harita-aksiyon-buton" title="Haritayı Büyüt"><i class="fa-solid fa-expand"></i></button>
+                        <small id="ajansUlkeleriSifirla" style="cursor:pointer; color:var(--renk-ikincil-neon); text-transform:none;">Temizle</small>
+                    </div>
+                </div>
+                <div class="harita-kutusu" id="ajansHaritasiKonteyner">
+                    <!-- Gerçekçi Dünya Haritası SVG dinamik yüklenecektir -->
+                </div>
+            </div>
+            
+            <!-- Arama ve Ajans Listesi -->
+            <div class="bar-bolumu" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                <div class="arama-kutusu">
+                    <i class="fa-solid fa-magnifying-glass arama-ikonu"></i>
+                    <input type="text" id="ajansAra" class="arama-girdisi" placeholder="Ajans ara (AA, Reuters, AP...)">
+                </div>
+                <div class="liste-alani" id="ajansListesi">
+                    <!-- Dinamik olarak JS ile doldurulacak -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- ORTA GÖVDE: CANLI YAYIN IZGARASI VE ANLIK HABER AKIŞI -->
+        <section class="orta-govde">
+            <!-- TV Izgarası Kontrol Çubuğu -->
+            <div class="izgara-kontrol-cubugu">
+                <div class="yayin-basligi-alani">
+                    <span class="yayin-kaynagi-etiketi" id="oynaticiEtiket">CANLI YAYIN</span>
+                    <h2 class="yayin-basligi" id="oynaticiBasligi">Kanal Izgarası</h2>
+                </div>
+                <div class="izgara-kontrol-saglar">
+                    <!-- Izgara boyutu seçici -->
+                    <div class="izgara-boyut-secici" id="izgaraBoyutSecici">
+                        <button class="izgara-boyut-dugme" data-cols="2" title="2x2 Izgara"><i class="fa-solid fa-th-large"></i> 2×2</button>
+                        <button class="izgara-boyut-dugme" data-cols="3" title="3x2 Izgara"><i class="fa-solid fa-th"></i> 3×2</button>
+                        <button class="izgara-boyut-dugme" data-cols="3" data-rows="3" title="3x3 Izgara"><i class="fa-solid fa-border-all"></i> 3×3</button>
+                        <button class="izgara-boyut-dugme" data-cols="4" title="4x4 Izgara"><i class="fa-solid fa-border-all"></i> 4×4</button>
+                        <button class="izgara-boyut-dugme aktif" data-cols="5" title="5x5 Izgara"><i class="fa-solid fa-border-all"></i> 5×5</button>
+                        <button class="izgara-boyut-dugme" data-cols="1" title="Tek Kanal"><i class="fa-solid fa-square"></i> 1×1</button>
+                    </div>
+                    <button id="dugmeHaberleriGoster" class="buton-modern" style="padding: 5px 12px; font-size: 12px;">
+                        <i class="fa-solid fa-newspaper"></i> Haber Akışı
+                    </button>
+                    <button id="dugmeTamEkran" class="buton-modern" style="padding: 5px 12px; font-size: 12px;" title="Tam Ekran Modu (F)">
+                        <i class="fa-solid fa-expand"></i> Tam Ekran
+                    </button>
+                    <button id="dugmeOynaticiKapat" class="buton-modern" style="padding: 5px 12px; font-size: 12px;">
+                        <i class="fa-solid fa-xmark"></i> Tümünü Kapat
+                    </button>
+                </div>
+            </div>
+
+            <!-- TV Izgarası Ana Alanı -->
+            <!-- TV Izgarası Ana Alanı ve Kapsayıcısı -->
+            <div class="tv-izgara-kapsayici" id="tvIzgaraKapsayici">
+                <div class="tv-izgara-alani" id="tvIzgaraAlani">
+                    <!-- Boş Durum -->
+                    <div class="oynatici-bos-durum" id="oynaticiBosDurum">
+                        <i class="fa-solid fa-tv"></i>
+                        <h3>Canlı Kanal Izgarası</h3>
+                        <p>Sağdaki kanal listesinden kanalları seçerek buraya ekleyebilirsiniz. Birden fazla kanalı aynı anda izleyebilirsiniz.</p>
+                    </div>
+                    <!-- Iframe kartları dinamik yüklenecek -->
+                </div>
+                <!-- Alt Kayan Yazı Bandı (Ticker) - Normalde Gizli, Tam Ekran Modunda Görünür -->
+                <div class="haber-kayan-yazi-alani" id="haberKayanYaziAlani">
+                    <div class="kayan-yazi-etiket"><i class="fa-solid fa-bolt"></i> SON DAKİKA</div>
+                    <div class="kayan-yazi-serit">
+                        <div class="kayan-yazi-icerik" id="kayanYaziIcerik">Güncel haber akışı yükleniyor...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alt Bölüm: Anlık Haber Akışı (gizlenebilir) -->
+            <div class="orta-alt-panel" id="haberAkisiPaneli">
+                <div class="haberler-ust-bar">
+                    <div class="haberler-baslik">
+                        <i class="fa-solid fa-bolt"></i> ANLIK GÜNDEM AKIŞI (<span id="seciliAjansAdi">Tüm Ajanslar</span>)
+                    </div>
+                    <div class="haberler-durum">
+                        <select id="zamanFiltresi" class="ayar-secim" style="width: auto; padding: 4px 8px; height: 28px; font-size: 11px; margin-right: 12px; border-radius: 6px; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--kenarlik-rengi); color: var(--metin-ana);">
+                            <option value="24">Son 24 Saat</option>
+                            <option value="48">Son 48 Saat</option>
+                            <option value="72">Son 72 Saat</option>
+                            <option value="96">Son 96 Saat</option>
+                            <option value="168" selected>Son 7 Gün (Varsayılan)</option>
+                        </select>
+                        <i class="fa-solid fa-arrows-rotate guncelleme-doneri" id="guncellemeIkonu"></i> 
+                        <span id="guncellemeMetni">Güncelleniyor...</span>
+                    </div>
+                </div>
+                <div class="haberler-liste-alani" id="haberlerListesi">
+                    <!-- Dinamik haber kartları gelecek -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SAĞ BAR: CANLI YAYIN HABER KANALLARI VE HARİTASI -->
+        <aside class="yan-bar sag">
+            <!-- Harita Bölümü -->
+            <div class="bar-bolumu">
+                <div class="bar-bolum-basligi">
+                    <span><i class="fa-solid fa-tv"></i> Kanal Haritası</span>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button type="button" id="kanalHaritaBuyut" class="harita-aksiyon-buton" title="Haritayı Büyüt"><i class="fa-solid fa-expand"></i></button>
+                        <small id="kanalUlkeleriSifirla" style="cursor:pointer; color:var(--renk-ikincil-neon); text-transform:none;">Temizle</small>
+                    </div>
+                </div>
+                <div class="harita-kutusu" id="kanalHaritasiKonteyner">
+                    <!-- Gerçekçi Dünya Haritası SVG dinamik yüklenecektir -->
+                </div>
+            </div>
+            
+            <!-- Arama ve Kanal Listesi -->
+            <div class="bar-bolumu" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                <div class="arama-kutusu">
+                    <i class="fa-solid fa-magnifying-glass arama-ikonu"></i>
+                    <input type="text" id="kanalAra" class="arama-girdisi" placeholder="Haber kanalı ara (TRT, BBC, CNN...)">
+                </div>
+                <div class="liste-alani" id="kanalListesi">
+                    <!-- Dinamik olarak JS ile doldurulacak -->
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- AYARLAR MODALI -->
+    <div class="modal-kapsayici" id="ayarlarModal">
+        <div class="modal-icerik">
+            <div class="modal-ust">
+                <h3 class="modal-baslik"><i class="fa-solid fa-sliders"></i> Ayarlar</h3>
+                <button class="modal-kapat" id="dugmeAyarlarKapat"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-govde" style="display: flex; gap: 24px; flex: 1; overflow: hidden;">
+                
+                <!-- SOL SÜTUN: AJANS AYARLARI -->
+                <div class="modal-sutun" style="flex: 1; border-right: 1px solid var(--kenarlik-rengi); padding-right: 24px; display: flex; flex-direction: column; gap: 16px;">
+                    <h4 class="ayar-etiketi" style="color: #fff; margin-bottom: 4px; font-size: 13px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fa-solid fa-newspaper" style="color: var(--renk-birincil-neon)"></i> Ajans Tercihleri
+                    </h4>
+                    
+                    <!-- Varsayılan Haber Ajansı Seçimi -->
+                    <div class="ayar-grubu">
+                        <label class="ayar-etiketi" for="ayarVarsayilanAjans">Açılışta Varsayılan Seçilecek Ajans</label>
+                        <select id="ayarVarsayilanAjans" class="ayar-secim">
+                            <option value="all">Tüm Ajanslar</option>
+                        </select>
+                    </div>
+
+                    <!-- Haber Güncelleme Sıklığı -->
+                    <div class="ayar-grubu">
+                        <label class="ayar-etiketi" for="ayarGuncellemeSikligi">Haber Güncelleme Sıklığı</label>
+                        <select id="ayarGuncellemeSikligi" class="ayar-secim">
+                            <option value="60000">1 Dakika</option>
+                            <option value="120000" selected>2 Dakika (Önerilen)</option>
+                            <option value="300000">5 Dakika</option>
+                            <option value="600000">10 Dakika</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- SAĞ SÜTUN: KANAL AYARLARI -->
+                <div class="modal-sutun" style="flex: 1.2; display: flex; flex-direction: column; gap: 16px;">
+                    <h4 class="ayar-etiketi" style="color: #fff; margin-bottom: 4px; font-size: 13px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fa-solid fa-tv" style="color: var(--renk-ikincil-neon)"></i> Canlı TV Ayarları
+                    </h4>
+
+                    <!-- Varsayılan Canlı Yayın Kanalı Seçimi -->
+                    <div class="ayar-grubu">
+                        <label class="ayar-etiketi" for="ayarVarsayilanKanal">Açılışta Varsayılan Oynatılacak Kanal</label>
+                        <select id="ayarVarsayilanKanal" class="ayar-secim">
+                            <option value="none">Hiçbiri (Oynatıcı Kapalı/Boş Başlasın)</option>
+                        </select>
+                    </div>
+
+                    <hr style="border: 0; border-top: 1px solid var(--kenarlik-rengi); margin: 4px 0;">
+
+                    <!-- Manuel Kanal Ekleme -->
+                    <div class="kanal-yonetim-alani" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
+                        <h5 class="ayar-etiketi" style="color: var(--metin-ana); margin-bottom: 10px; font-size: 11px; text-transform: none; display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-circle-plus" style="color: var(--renk-ikincil-neon)"></i> Yeni Canlı Yayın Kanalı Ekle
+                        </h5>
+                        <div id="kanalEkleHata" style="color: var(--hata-rengi); font-size: 11px; margin-bottom: 8px; display: none;"></div>
+                        <form id="formKanalEkle" onsubmit="return false;" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+                            <div style="grid-column: span 2;">
+                                <input type="text" id="ekleKanalAdi" class="arama-girdisi" style="padding-left: 12px; height: 34px; font-size: 12px;" placeholder="Kanal Adı (Örn: Sky News)" required>
+                            </div>
+                            <div>
+                                <input type="text" id="ekleKanalId" class="arama-girdisi" style="padding-left: 12px; height: 34px; font-size: 12px;" placeholder="Canlı Yayın URL (Örn: https://...)" required>
+                            </div>
+                            <div>
+                                <select id="ekleKanalBolgesi" class="ayar-secim" style="height: 34px; font-size: 12px; padding: 0 8px;" required>
+                                    <option value="" disabled selected>Bölge Seçin</option>
+                                    <option value="Türkiye">Türkiye</option>
+                                    <option value="Avrupa">Avrupa</option>
+                                    <option value="Kuzey Amerika">Kuzey Amerika</option>
+                                    <option value="Güney Amerika">Güney Amerika</option>
+                                    <option value="Asya">Asya</option>
+                                    <option value="Ortadoğu">Ortadoğu</option>
+                                    <option value="Afrika">Afrika</option>
+                                    <option value="Avustralya">Avustralya</option>
+                                </select>
+                            </div>
+                            <div style="grid-column: span 2; display: flex; justify-content: flex-end; gap: 8px; margin-top: 2px;">
+                                <button type="button" id="dugmeKanalIptal" class="buton-modern" style="padding: 4px 10px; font-size: 11px; background: rgba(239, 68, 68, 0.15); border-color: var(--hata-rengi); display: none;">
+                                    <i class="fa-solid fa-xmark"></i> İptal
+                                </button>
+                                <button type="button" id="dugmeKanalEkle" class="buton-modern" style="padding: 4px 10px; font-size: 11px; background: rgba(6, 182, 212, 0.15); border-color: var(--renk-ikincil);">
+                                    <i class="fa-solid fa-plus"></i> Kanal Ekle
+                                </button>
+                            </div>
+                        </form>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <h5 class="ayar-etiketi" style="color: var(--metin-ana); margin: 0; font-size: 11px; text-transform: none; display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-list-check" style="color: var(--renk-birincil-neon)"></i> Kayıtlı Canlı TV Kanalları
+                            </h5>
+                            <small id="dugmeKanallariSifirla" style="cursor:pointer; color:var(--renk-ikincil-neon); text-transform:none; font-size: 10px;" title="Tüm kanalları varsayılan ayarlara sıfırlar">Sıfırla</small>
+                        </div>
+                        <div class="ozel-kanallar-konteyner" style="flex: 1; min-height: 180px;">
+                            <ul id="ozelKanallarListesi" class="ozel-kanallar-listesi">
+                                <!-- Dinamik olarak JS ile kanallar listelenecek -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-alt">
+                <button class="buton-modern" id="dugmeAyarlarKaydet" style="background: var(--renk-birincil); border-color: var(--renk-birincil-neon);">
+                    Kaydet ve Uygula
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BÜYÜK DÜNYA HARİTASI MODALI (Leaflet) -->
+    <div class="modal-kapsayici" id="haritaBuyutModal">
+        <div class="modal-icerik" style="width: 95%; max-width: 1400px; height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-ust">
+                <h3 class="modal-baslik" id="buyukHaritaBaslik"><i class="fa-solid fa-earth-americas"></i> Global Dünya Haritası - Ajanslar ve Kanallar</h3>
+                <button class="modal-kapat" id="dugmeHaritaBuyutKapat"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-govde" style="flex: 1; padding: 0; background: #000;">
+                <div id="buyukHaritaKonteyner" style="width: 100%; height: 100%;">
+                    <!-- Leaflet Haritası yüklenecek -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Uygulama Kodları -->
+    <script src="uygulama.js"></script>
+</body>
+</html>
