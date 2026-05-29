@@ -131,6 +131,74 @@ body {
     gap: 16px;
 }
 
+/* Mod Değiştirici (Switch) */
+.mod-switch-alani {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--kenarlik-rengi);
+}
+
+.mod-etiketi {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--metin-yardimci);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mod-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 22px;
+}
+
+.mod-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.mod-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--renk-birincil);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.mod-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .mod-slider {
+    background-color: var(--renk-ikincil-neon);
+}
+
+input:focus + .mod-slider {
+    box-shadow: 0 0 8px var(--renk-ikincil-neon);
+}
+
+input:checked + .mod-slider:before {
+    transform: translateX(22px);
+}
+
 .buton-modern {
     background: var(--kart-arka-plan);
     border: 1px solid var(--kenarlik-rengi);

@@ -62,6 +62,33 @@ const HABER_KANALLARI = [
     { id: "kctv", ad: "KCTV", bolge: "Asya", ulke: "KP", yayinUrl: "https://www.youtube.com/watch?v=mW0DLvWt_ek", logo: "KCTV" }
 ];
 
+// Canlı Kamera Listesi (Dünya Çapında)
+const CANLI_KAMERALAR = [
+    { id: "cam-ispanya", ad: "İspanya", bolge: "Avrupa", ulke: "ES", yayinUrl: "https://www.youtube.com/watch?v=NHRDdaH4LpU", logo: "ESP" },
+    { id: "cam-italya", ad: "İtalya", bolge: "Avrupa", ulke: "IT", yayinUrl: "https://www.youtube.com/watch?v=wMT2aNcP4Wg", logo: "ITA" },
+    { id: "cam-dunya1", ad: "Dünya 1", bolge: "Global", ulke: "GL", yayinUrl: "https://www.youtube.com/watch?v=EFum1rGUdkk", logo: "WRL" },
+    { id: "cam-puertocruz", ad: "Puerto de la Cruz", bolge: "Avrupa", ulke: "ES", yayinUrl: "https://www.youtube.com/watch?v=4_EkgiT078o", logo: "ESP" },
+    { id: "cam-jerusalem", ad: "Jerusalem", bolge: "Ortadoğu", ulke: "IL", yayinUrl: "https://www.youtube.com/watch?v=LueIPEfeFyo", logo: "ISR" },
+    { id: "cam-niscemi", ad: "Niscemi", bolge: "Avrupa", ulke: "IT", yayinUrl: "https://www.youtube.com/watch?v=MFCLTWUiAYE", logo: "ITA" },
+    { id: "cam-greece", ad: "Greece", bolge: "Avrupa", ulke: "GR", yayinUrl: "https://www.youtube.com/watch?v=5p-s-1453Us", logo: "GRE" },
+    { id: "cam-canada", ad: "Canada", bolge: "Kuzey Amerika", ulke: "CA", yayinUrl: "https://www.youtube.com/watch?v=uGaxXTlz_f8", logo: "CAN" },
+    { id: "cam-venice", ad: "Venice", bolge: "Avrupa", ulke: "IT", yayinUrl: "https://www.youtube.com/watch?v=x4AlaibltlA", logo: "ITA" },
+    { id: "cam-losangeles", ad: "Los Angeles", bolge: "Kuzey Amerika", ulke: "US", yayinUrl: "https://www.youtube.com/watch?v=EO_1LWqsCNE", logo: "USA" },
+    { id: "cam-japan", ad: "Japan", bolge: "Asya", ulke: "JP", yayinUrl: "https://www.youtube.com/watch?v=AiNCbGzabVo", logo: "JPN" },
+    { id: "cam-netherland", ad: "Netherland", bolge: "Avrupa", ulke: "NL", yayinUrl: "https://www.youtube.com/watch?v=AiNCbGzabVo", logo: "NED" },
+    { id: "cam-kovanlik", ad: "Kovanlık", bolge: "Türkiye", ulke: "TR", yayinUrl: "https://www.youtube.com/watch?v=AiNCbGzabVo", logo: "TR" },
+    { id: "cam-dunya2", ad: "Dünya 2", bolge: "Global", ulke: "GL", yayinUrl: "https://www.youtube.com/watch?v=i10aOLMK76k", logo: "WRL" },
+    { id: "cam-uzay1", ad: "Uzay (ISS)", bolge: "Uzay", ulke: "GL", yayinUrl: "https://www.youtube.com/watch?v=0FBiyFpV__g", logo: "ISS" },
+    { id: "cam-houston", ad: "Houston Texas", bolge: "Kuzey Amerika", ulke: "US", yayinUrl: "https://www.youtube.com/watch?v=SDK_m1_BVJ4", logo: "USA" },
+    { id: "cam-filipin", ad: "Filipin", bolge: "Asya", ulke: "PH", yayinUrl: "https://www.youtube.com/watch?v=d17IkvT4EkQ", logo: "PHI" },
+    { id: "cam-stpetersburg", ad: "St. Petersburg Russia", bolge: "Avrupa", ulke: "RU", yayinUrl: "https://www.youtube.com/watch?v=fUsJZTHeZn4", logo: "RUS" },
+    { id: "cam-globalquake", ad: "GlobalQuake", bolge: "Global", ulke: "GL", yayinUrl: "https://www.youtube.com/watch?v=rvtygG4n6ew", logo: "EQ" },
+    { id: "cam-neworleans", ad: "New Orleans", bolge: "Kuzey Amerika", ulke: "US", yayinUrl: "https://www.youtube.com/watch?v=Ksrleaxxxhw", logo: "USA" },
+    { id: "cam-dublin", ad: "Dublin", bolge: "Avrupa", ulke: "IE", yayinUrl: "https://www.youtube.com/watch?v=3nyPER2kzqk", logo: "IRE" },
+    { id: "cam-dunya3", ad: "Dünya 3", bolge: "Global", ulke: "GL", yayinUrl: "https://www.youtube.com/watch?v=fO9e9jnhYK8", logo: "WRL" },
+    { id: "cam-thailand", ad: "Thailand", bolge: "Asya", ulke: "TH", yayinUrl: "https://www.youtube.com/watch?v=6MMXJrzT5c0", logo: "THA" }
+];
+
 // Haber Ajansları Listesi (Kararlı ve Çalışan RSS Beslemeleri)
 const HABER_AJANSLARI = [
     { id: "aa", ad: "Anadolu Ajansı", bolge: "Türkiye", ulke: "TR", rssUrl: "https://www.aa.com.tr/tr/rss/default?cat=guncel", logo: "AA" },
@@ -770,6 +797,7 @@ class ArayuzYoneticisi {
 
         // Haber akışı görünürlük durumu
         this.haberAkisiGoruntu = true;
+        this.aktifMod = 'haber';
 
         // Filtre Durumları
         this.seciliAjans = this.ayarlarYoneticisi.varsayilanAjans;
@@ -839,6 +867,14 @@ class ArayuzYoneticisi {
     }
 
     olaylariBagla() {
+        this.modSwitch = document.getElementById("modSwitchGirdisi");
+        if (this.modSwitch) {
+            this.modSwitch.addEventListener("change", (e) => {
+                this.aktifMod = e.target.checked ? "kamera" : "haber";
+                this.moduUygula();
+            });
+        }
+
         if (this.zamanFiltresi) {
             this.zamanFiltresi.addEventListener("change", () => this.haberleriFiltreleVeGoster());
         }
@@ -968,40 +1004,36 @@ class ArayuzYoneticisi {
             }
         });
     }
+    moduUygula() {
+        this.oynatici.tumunuKaldir();
+        
+        if (this.aktifMod === 'kamera') {
+            CANLI_KAMERALAR.slice(0, 25).forEach(kamera => {
+                this.oynatici.kanalEkle(kamera);
+            });
+            if (this.oynatici.etiket) this.oynatici.etiket.textContent = 'CANLI KAMERA';
+        } else {
+            const varsayilanAcikKanalIdleri = [
+                "brt-1", "brt-2", "brt-3", "sigma-tv", "ert-news", "open-tv",
+                "alikhbaria-syria", "syria-tv", "i24-news", "kan-11",
+                "trt-haber", "cnn-turk", "sozcu-tv", "halk-tv", "haber-global", "ntv", "a-haber", "bein-sports",
+                "bbc-news", "france-24", "dw-news", "euronews",
+                "bloomberg", "livenow-fox", "cbs-news"
+            ];
+            varsayilanAcikKanalIdleri.forEach(kanalId => {
+                const kanal = this.ayarlarYoneticisi.kanallar.find(k => k.id === kanalId);
+                if (kanal) this.oynatici.kanalEkle(kanal);
+            });
+            if (this.oynatici.etiket) this.oynatici.etiket.textContent = 'CANLI YAYIN';
+        }
+        this.kanallariRenderEt();
+    }
+
     async uygulamayiBaslat() {
         this.ayarlarSecenekleriniDoldur();
         this.ajanslariRenderEt();
-        this.kanallariRenderEt();
-
-        // Varsayılan olarak açık gelmesi istenen 25 kanalın ID listesi (5x5 Izgarayı dolduracak şekilde)
-        const varsayilanAcikKanalIdleri = [
-            // 1. KKTC Kanalları (3)
-            "brt-1", "brt-2", "brt-3",
-            // 2. Güney Kıbrıs Kanalları (1)
-            "sigma-tv",
-            // 3. Yunan Kanalları (2)
-            "ert-news", "open-tv",
-            // 4. Suriye Kanalları (2)
-            "alikhbaria-syria", "syria-tv",
-            // 5. İsrail Kanalları (2)
-            "i24-news", "kan-11",
-            // 6. Türk Kanalları (8)
-            "trt-haber", "cnn-turk", "sozcu-tv", "halk-tv", "haber-global", "ntv", "a-haber", "bein-sports",
-            // 7. Avrupa Kanalları (4)
-            "bbc-news", "france-24", "dw-news", "euronews",
-            // 8. ABD Kanalları (3)
-            "bloomberg", "livenow-fox", "cbs-news"
-        ];
-
-        // Bu kanalları ızgaraya ekle
-        varsayilanAcikKanalIdleri.forEach(kanalId => {
-            const kanal = this.ayarlarYoneticisi.kanallar.find(k => k.id === kanalId);
-            if (kanal) {
-                this.oynatici.kanalEkle(kanal);
-            }
-        });
-
-        this.kanallariRenderEt();
+        
+        this.moduUygula();
 
         await this.haberleriYenile();
         this.zamanlayiciyiBaslat();
@@ -1173,7 +1205,7 @@ class ArayuzYoneticisi {
         this.kanalListesiKonteyner.innerHTML = "";
 
         // Kayıtlı olan tüm kanalları (varsayılan + özel) kullanıyoruz
-        let kanallar = [...this.ayarlarYoneticisi.kanallar];
+        let kanallar = this.aktifMod === 'kamera' ? [...CANLI_KAMERALAR] : [...this.ayarlarYoneticisi.kanallar];
 
         if (this.kanalAramaMetni) {
             kanallar = kanallar.filter(k => k.ad.toLowerCase().includes(this.kanalAramaMetni));
